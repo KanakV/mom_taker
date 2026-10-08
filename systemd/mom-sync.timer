@@ -1,0 +1,10 @@
+[Unit]
+Description=Pull MoM recordings from cloud storage every 10 minutes
+
+[Timer]
+OnStartupSec=2min
+OnUnitActiveSec=10min
+Unit=mom-sync.service
+
+[Install]
+WantedBy=timers.target

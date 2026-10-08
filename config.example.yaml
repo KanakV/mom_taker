@@ -1,0 +1,100 @@
+# Copy to config.yaml and fill in the FILL_ME values. config.yaml is gitignored.
+timezone: Asia/Kolkata
+
+# Calendar the pipeline watches. Preferred: share the calendar with your service
+# account ("See all event details") and set its ID here (Calendar settings →
+# "Integrate calendar" → Calendar ID).
+calendar_id: "FILL_ME@group.calendar.google.com"
+# Fallback if calendar_id is unset: the calendar's secret iCal address.
+# Note: Google aggressively rate-limits this endpoint on shared networks.
+ical_url: ""
+
+# Where recordings arrive and where processed files are archived (local folders;
+# mom_sync.sh fills the inbox from Dropbox/Drive).
+inbox_dir: ~/GoogleDrive/mom-inbox
+done_dir:  ~/GoogleDrive/mom-done
+
+groq_api_key: "FILL_ME"                    # console.groq.com → API Keys (free tier)
+whisper_model: whisper-large-v3-turbo
+llm_model: openai/gpt-oss-120b             # check `groq models list` — models get retired
+language: en
+# Domain jargon to steer transcription; replace with your own vocabulary.
+whisper_prompt: "Project-specific terms, acronyms, tool names."
+
+# Correct spellings of people's names: steers transcription and lets the
+# summariser fix garbled names. Unknown names are flagged with "(?)".
+team_names: [Alice, Bob]
+
+service_account_json: ~/mom/service-account.json
+draft_prefix: ""                           # e.g. "DRAFT — " to review before cleaning up
+heading_format: "%d %b"                    # dated tab/heading title, e.g. "29 Sep"
+
+run_after: "next_day 07:00"                # when a meeting becomes due: "2h", "30m",
+                                           # "same_day 22:00", "next_day 07:00"
+lookback_days: 7                           # how long to keep retrying unmatched meetings
+match_slack_before_min: 20                 # recording may start this early
+match_slack_after_min: 120                 # ...or be uploaded this late after the end
+
+# Doc routing: the first doc with a `match` keyword in the event title wins;
+# a doc with an empty `match` is the catch-all for everything else.
+# Within a doc, `section_map` picks the tab (first match), else `default_section`.
+# Every tab named here must exist as a top-level tab in that doc, and each doc
+# must be shared with the service account as Editor.
+docs:
+  - doc_id: "FILL_ME"                      # your project's MoM doc
+    match: [projectname]                   # event-title keywords that route here
+    default_section: General
+    section_map:
+      General: [general, all hands, weekly]
+      # SomeTab: [keyword1, keyword2]
+
+  - doc_id: "FILL_ME"                      # catch-all doc for all other meetings
+    match: []                              # empty = matches everything else
+    default_section: General
+    section_map:
+      General: []
+
+# The summarisation prompt. Edit freely, but keep the output contract the doc
+# renderer understands: "## " headings, "- " flat bullets, and one final pipe table.
+mom_prompt: |
+  You are writing minutes for the "{section}" team meeting "{title}" held {date}, {start}–{end}.
+  The transcript is an automatic, noisy recording with no speaker labels: names, numbers and
+  technical terms may be garbled. Do NOT invent details; write "(unclear)" where something
+  cannot be made out.
+
+  Team roster — the only valid name spellings: {names}.
+  Map any transcribed name to the closest roster name. If no roster name plausibly fits,
+  write the name as heard followed by "(?)". Never introduce two spellings for one person.
+
+  Output using EXACTLY this markdown structure — "## " headings, "- " flat bullets, and one
+  final pipe table. No other markdown, no emoji, no nested bullets. Omit a section's bullets
+  only if truly nothing applies, writing "- none". Keep every section heading.
+
+  ## Meeting details
+  - Attendees: roster names heard in the transcript, else "not captured"
+  - Purpose: one line
+
+  ## Progress — done
+  - one bullet per piece of completed work reported, past tense, concrete
+
+  ## Discussion
+  - one bullet per topic: the reasoning and trade-offs, not just the conclusion
+
+  ## Decisions
+  - one bullet per decision actually made
+
+  ## Remaining — open or blocked
+  - unfinished work, blockers, and risks called out in the meeting
+
+  ## Dates to remember
+  - <date or day> — <what happens or is due then>
+
+  ## Open questions
+  - questions raised but not answered
+
+  ## Action items
+  | # | Action | Owner | Due |
+  | 1 | <task> | <roster name or "unassigned"> | <deadline if stated, else "—"> |
+
+  The action items table is the most important part: include every task assigned or implied
+  in the meeting. If there are truly none, write exactly one row: | — | none | — | — |

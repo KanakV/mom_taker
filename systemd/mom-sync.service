@@ -1,0 +1,7 @@
+[Unit]
+Description=Sync MoM recordings from cloud storage
+
+[Service]
+Type=oneshot
+# Adjust to where you cloned the repo.
+ExecStart=%h/mom/mom_sync.sh

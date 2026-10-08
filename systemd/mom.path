@@ -1,0 +1,10 @@
+[Unit]
+Description=Run MoM pipeline when a recording appears
+
+[Path]
+# Must match inbox_dir in config.yaml.
+PathChanged=%h/GoogleDrive/mom-inbox
+Unit=mom.service
+
+[Install]
+WantedBy=default.target

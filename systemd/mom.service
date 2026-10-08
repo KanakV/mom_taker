@@ -1,0 +1,8 @@
+[Unit]
+Description=Meeting minutes pipeline
+
+[Service]
+Type=oneshot
+# Adjust both paths to where you cloned the repo.
+WorkingDirectory=%h/mom
+ExecStart=%h/mom/venv/bin/python %h/mom/mom_pipeline.py

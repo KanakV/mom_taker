@@ -1,0 +1,25 @@
+# secrets — never commit these
+config.yaml
+service-account.json
+
+# runtime state and logs
+processed.json
+mom.log
+launchd.log
+.lock
+*.error
+
+# environment
+venv/
+__pycache__/
+*.pyc
+
+# personal notes and local documents
+mom_pipeline_setup.md
+NIDAR MoMs.md
+
+# recordings, in case folders end up inside the repo
+*.m4a
+*.mp3
+*.wav
+*.mp4
